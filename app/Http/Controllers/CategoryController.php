@@ -39,7 +39,8 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-            'status' => 'required|in:0,1'
+            'status' => 'required|in:0,1',
+        'showHome' => 'required|in:Yes,No',
         ]);
 
         $imageName = null;
@@ -66,7 +67,9 @@ class CategoryController extends Controller
             'name'   => $request->name,
             'slug'   => $request->slug ?: Str::slug($request->name),
             'image'  => $imageName,
-            'status' => $request->status
+            'status' => $request->status,
+        'showHome' => $request->showHome,  // Remove the ?? 'No' part
+
         ]);
 
         \Log::info('Category created:', $category->toArray());
@@ -116,6 +119,8 @@ public function update(Request $request, $id)
         'slug'   => 'nullable|string|max:255',
         'status' => 'required|boolean',
         'image'  => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+        'showHome' => 'required|in:Yes,No',
+
     ]);
 
     $category = Category::findOrFail($id);
@@ -124,6 +129,8 @@ public function update(Request $request, $id)
         'name'   => $request->name,
         'slug'   => $request->slug,
         'status' => $request->status,
+        'showHome' => $request->showHome,  // Remove the ?? 'No' part
+
     ];
 
     // 🔥 IMAGE UPDATE LOGIC

@@ -107,6 +107,15 @@
                         </select>
                     </div>
 
+
+                             <div class="mb-3">
+    <label>Show on Home</label>
+    <select name="showHome" class="form-control" id="showHome">
+        <option value="Yes" {{ old('showHome', 'Yes') == 'Yes' ? 'selected' : '' }}>Yes</option>
+        <option value="No" {{ old('showHome') == 'No' ? 'selected' : '' }}>No</option>
+    </select>
+</div>
+
                     {{-- Buttons --}}
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Create

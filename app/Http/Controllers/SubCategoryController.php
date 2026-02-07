@@ -50,7 +50,9 @@ public function store(Request $request)
         'category_id' => 'required',
         'name'        => 'required|string|max:255',
         'slug'        => 'nullable|string|max:255',
-        'status'      => 'required'
+        'status'      => 'required',
+        'showHome' => 'required|in:Yes,No',
+
     ]);
 
     SubCategory::create([
@@ -58,6 +60,8 @@ public function store(Request $request)
         'name'        => $request->name,
         'slug'        => $request->slug ?? Str::slug($request->name),
         'status'      => $request->status,
+        'showHome' => $request->showHome,  // Remove the ?? 'No' part
+
     ]);
 
     return redirect()->route('admin.sub-categories.index')
@@ -81,7 +85,9 @@ public function update(Request $request, $id)
         'category_id' => 'required',
         'name'        => 'required|string|max:255',
         'slug'        => 'nullable|string|max:255',
-        'status'      => 'required'
+        'status'      => 'required',
+                'showHome' => 'required|in:Yes,No',
+
     ]);
 
     $subCategory->update([
@@ -89,6 +95,8 @@ public function update(Request $request, $id)
         'name'        => $request->name,
         'slug'        => $request->slug ?? Str::slug($request->name),
         'status'      => $request->status,
+        'showHome' => $request->showHome,  // Remove the ?? 'No' part
+
     ]);
 
     return redirect()->route('admin.sub-categories.index')

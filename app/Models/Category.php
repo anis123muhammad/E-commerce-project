@@ -10,10 +10,19 @@ class Category extends Model
         'name',
         'slug',
         'image',
-        'status'
+        'status',
+        'showHome',
+
     ];
 
     protected $casts = [
         'status' => 'integer',
     ];
-}   
+
+
+        public function sub_categories()
+    {
+        return $this->hasMany(SubCategory::class);
+    }
+
+}

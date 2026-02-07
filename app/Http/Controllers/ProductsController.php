@@ -18,7 +18,7 @@ class ProductsController extends Controller
     public function index(Request $request)
     {
         $products = Product::with('images')
-            ->when($request->search, fn($q) => $q->where('title', 'like', "%{$request->search}%"))
+ ->when($request->search, fn($q) => $q->where('title', 'like', "%{$request->search}%"))
             ->latest()
             ->paginate(10);
 
@@ -28,7 +28,9 @@ class ProductsController extends Controller
     // Show create form
     public function create()
     {
-        return view('admin.products.create', [
+        return view('admin.products.create',
+
+        [
             'categories' => Category::where('status', 1)->get(),
             'brands' => Brand::where('status', 1)->get()
         ]);
@@ -72,6 +74,7 @@ class ProductsController extends Controller
             }
         }
 
+
         return redirect()->route('admin.products.index')
             ->with('success', 'Product created successfully!');
     }
@@ -81,7 +84,9 @@ class ProductsController extends Controller
     {
         $product = Product::with('images')->findOrFail($id);
 
-        return view('admin.products.edit', [
+        return view('admin.products.edit',
+
+        [
             'product' => $product,
             'categories' => Category::where('status', 1)->get(),
             'brands' => Brand::where('status', 1)->get(),

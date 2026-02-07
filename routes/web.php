@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\FrontController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -121,3 +122,11 @@ Route::get('/user/dashboard', function () {
 Route::view('/about', 'about')->name('about');
 Route::view('/contact', 'contact')->name('contact');
 
+
+
+
+
+// front routes
+
+
+Route::get('/', [FrontController::class, 'index'])->name('front.home');

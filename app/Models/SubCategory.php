@@ -16,6 +16,8 @@ class SubCategory extends Model
         'name',
         'slug',
         'status',
+                'showHome',  // ← Make sure this is here!
+
     ];
 
 
