@@ -9,10 +9,13 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
+   protected $fillable = [
         'title',
         'slug',
         'description',
+        'short_description',      // Add this
+        'shipping_returns',        // Add this
+        'related_products',        // Add this
         'price',
         'compare_price',
         'category_id',
@@ -20,6 +23,7 @@ class Product extends Model
         'brand_id',
         'sku',
         'barcode',
+        'barcode_image',
         'track_qty',
         'qty',
         'is_featured',
@@ -49,4 +53,9 @@ class Product extends Model
     {
         return $this->belongsTo(Brand::class);
     }
+    public function firstImage()
+    {
+    return $this->hasOne(ProductImage::class)->latest();
+    }
+
 }

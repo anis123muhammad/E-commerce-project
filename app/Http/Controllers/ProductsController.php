@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use App\Models\Product;
@@ -10,9 +9,10 @@ use App\Models\SubCategory;
 use Intervention\Image\Laravel\Facades\Image;
 use App\Models\Brand;
 use Illuminate\Support\Str;
+use Milon\Barcode\DNS1D;
 use Illuminate\Support\Facades\File;
 
-class ProductsController extends Controller
+class ProductsController  extends Controller
 {
     // List all products
     public function index(Request $request)
@@ -21,6 +21,7 @@ class ProductsController extends Controller
  ->when($request->search, fn($q) => $q->where('title', 'like', "%{$request->search}%"))
             ->latest()
             ->paginate(10);
+
 
         return view('admin.products.index', compact('products'));
     }
@@ -50,6 +51,8 @@ class ProductsController extends Controller
             'title' => $request->title,
             'slug' => Str::slug($request->title),
             'description' => $request->description,
+            'short_description' => $request->short_description,
+            'shipping_returns' => $request->shipping_returns,
             'price' => $request->price,
             'compare_price' => $request->compare_price,
             'category_id' => $request->category_id,
@@ -60,6 +63,7 @@ class ProductsController extends Controller
             'track_qty' => $request->track_qty ? 'Yes' : 'No',
             'qty' => $request->qty ?? 0,
             'is_featured' => $request->is_featured ?? 'No',
+            'related_products' => $request->related_products ?? 'No',
             'status' => $request->status ?? 1,
         ]);
 
@@ -73,6 +77,19 @@ class ProductsController extends Controller
                 ]);
             }
         }
+
+        // Generate barcode number
+    $barcodeNumber = 'PRD' . $product->id . rand(100, 999);
+    $product->barcode = $barcodeNumber;
+
+    // Generate barcode image
+    $barcode = new DNS1D();
+    $barcodeImage = $barcode->getBarcodePNG($barcodeNumber, 'C39');
+    $path = 'uploads/barcodes/' . $barcodeNumber . '.png';
+    file_put_contents(public_path($path), base64_decode($barcodeImage));
+    $product->barcode_image = $path;
+
+    $product->save();
 
 
         return redirect()->route('admin.products.index')
@@ -112,6 +129,8 @@ class ProductsController extends Controller
             'title' => $request->title,
             'slug' => Str::slug($request->title),
             'description' => $request->description,
+            'short_description' => $request->short_description,
+            'shipping_returns' => $request->shipping_returns,
             'price' => $request->price,
             'compare_price' => $request->compare_price,
             'category_id' => $request->category_id,
@@ -122,6 +141,7 @@ class ProductsController extends Controller
             'track_qty' => $request->track_qty ? 'Yes' : 'No',
             'qty' => $request->qty ?? 0,
             'is_featured' => $request->is_featured ?? 'No',
+            'related_products' => $request->related_products ?? 'No',
             'status' => $request->status ?? 1,
         ]);
 
@@ -231,4 +251,22 @@ class ProductsController extends Controller
             }
         }
     }
+
+public function product($slug)
+{
+    $product = Product::with(['images', 'category', 'brand'])
+        ->where('slug', $slug)
+        ->where('status', 1)
+        ->firstOrFail();
+
+             $relatedProducts = Product::where('related_products', 'Yes')
+        ->where('status', 1)
+        ->latest()
+        ->take(4)
+        ->with('firstImage')
+        ->get();
+
+    return view('front.product', compact('product', 'relatedProducts'));
+}
+
 }

@@ -74,6 +74,21 @@
                                     rows="6"
                                     placeholder="Product Description">{{ old('description', $product->description) }}</textarea>
                             </div>
+
+                             {{-- Short Description --}}
+<div class="mb-3">
+    <label for="short_description">Short Description</label>
+    <textarea name="short_description" id="short_description" class="form-control"
+        rows="6" placeholder="">{{ old('short_description', $product->short_description) }}</textarea>
+</div>
+
+{{-- Shipping Returns --}}
+<div class="mb-3">
+    <label for="shipping_returns">Shipping Returns</label>
+    <textarea name="shipping_returns" id="shipping_returns" class="form-control"
+        rows="6" placeholder="">{{ old('shipping_returns', $product->shipping_returns) }}</textarea>
+</div>
+
                         </div>
                     </div>
 
@@ -158,13 +173,14 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-6 mb-3">
-                                    <label for="barcode">Barcode</label>
-                                    <input type="text" name="barcode" id="barcode"
-                                        class="form-control"
-                                        placeholder="Barcode"
-                                        value="{{ old('barcode', $product->barcode) }}">
-                                </div>
+                               <div class="col-md-6 mb-3">
+    <label for="barcode">Barcode</label>
+    <input type="text" name="barcode" id="barcode"
+           class="form-control"
+           placeholder="Barcode"
+           value="{{ old('barcode', $product->barcode) }}"
+           readonly>
+</div>
                             </div>
 
                             <div class="mb-3">
@@ -190,7 +206,6 @@
 
                 <!-- RIGHT SIDE -->
                 <div class="col-md-4">
-
                     <!-- Status -->
                     <div class="card mb-3">
                         <div class="card-body">
@@ -269,6 +284,20 @@
                             </select>
                         </div>
                     </div>
+
+
+{{-- Related Products --}}
+<div class="card mb-3">
+    <div class="card-body">
+        <h2 class="h4 mb-3">Related Product</h2>
+
+        <select name="related_products" id="related_products" class="form-control">
+            <option value="No" {{ old('related_products', $product->related_products) == 'No' ? 'selected' : '' }}>No</option>
+            <option value="Yes" {{ old('related_products', $product->related_products)  == 'Yes' ? 'selected' : '' }}>Yes</option>
+        </select>
+    </div>
+</div>
+
 
                 </div>
             </div>

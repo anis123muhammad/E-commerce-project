@@ -73,6 +73,20 @@
                                     rows="6"
                                     placeholder="Product Description">{{ old('description') }}</textarea>
                             </div>
+
+
+                                          <div class="mb-3">
+    <label for="short_description">Short Description</label>
+    <textarea name="short_description" id="short_description" class="form-control"
+        rows="6" placeholder="Product Short Description"></textarea>
+</div>
+
+                         <div class="mb-3">
+    <label for="shipping_returns">Shipping Returns</label>
+    <textarea name="shipping_returns" id="shipping_returns" class="form-control"
+        rows="6" placeholder="Shipping Returns"></textarea>
+</div>
+
                         </div>
                     </div>
 
@@ -134,13 +148,15 @@
                                     @enderror
                                 </div>
 
-                                <div class="col-md-6 mb-3">
-                                    <label for="barcode">Barcode</label>
-                                    <input type="text" name="barcode" id="barcode"
-                                        class="form-control"
-                                        placeholder="Barcode"
-                                        value="{{ old('barcode') }}">
-                                </div>
+                               <div class="col-md-6 mb-3">
+    <label for="barcode">Barcode</label>
+    <input type="text" name="barcode" id="barcode"
+           class="form-control"
+           placeholder="Barcode"
+           value="{{ old('barcode') }}"
+           readonly>
+</div>
+
                             </div>
 
                             <div class="mb-3">
@@ -236,6 +252,17 @@
                             </select>
                         </div>
                     </div>
+{{-- related products --}}
+                                    <div class="card mb-3">
+    <div class="card-body">
+        <h2 class="h4 mb-3">Related Product</h2>
+
+      <select name="related_products" id="related_products" class="form-control">
+    <option value="No" {{ old('related_products', 'No') == 'No' ? 'selected' : '' }}>No</option>
+    <option value="Yes" {{ old('related_products') == 'Yes' ? 'selected' : '' }}>Yes</option>
+</select>
+    </div>
+</div>
 
                 </div>
             </div>

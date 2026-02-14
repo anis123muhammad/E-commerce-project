@@ -1,12 +1,13 @@
 <?php
 
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\FrontController;
-
+use App\Http\Controllers\ShopController;
 use Illuminate\Support\Facades\Route;
 
 /* Login */
@@ -130,3 +131,18 @@ Route::view('/contact', 'contact')->name('contact');
 
 
 Route::get('/', [FrontController::class, 'index'])->name('front.home');
+Route::get('/shop', [ShopController::class, 'index'])->name('front.shop');
+
+
+Route::get('/product/{slug}', [ProductsController::class, 'product'])->name('front.product');
+
+
+Route::post('/cart/add', [CartController::class, 'add'])->name('front.cart.add');
+
+Route::get('/cart', [CartController::class, 'cart'])->name('front.cart.page');
+
+Route::post('/cart/plus/{id}', [CartController::class, 'plus'])->name('cart.plus');
+
+Route::post('/cart/minus/{id}', [CartController::class, 'minus'])->name('cart.minus');
+
+Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
