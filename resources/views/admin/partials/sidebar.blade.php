@@ -50,14 +50,14 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link @if(request()->routeIs('admin.ship.index')) active @endif">
                         <i class="nav-icon fas fa-truck"></i>
                         <p>Shipping</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="#" class="nav-link @if(request()->route('admin.order.index')) active @endif">
                         <i class="nav-icon fas fa-shopping-bag"></i>
                         <p>Orders</p>
                     </a>

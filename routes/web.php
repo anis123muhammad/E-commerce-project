@@ -3,17 +3,22 @@
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\ThanksController;
+use App\Http\Controllers\UserauthController;
 use Illuminate\Support\Facades\Route;
 
 /* Login */
 
-Route::get('/login', [AdminAuthController::class, 'showLogin'])
-    ->name('login');
+
+    Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])
+    ->name('admin.login');
+
 
 Route::post('/login', [AdminAuthController::class, 'login'])
     ->name('login.submit');
@@ -102,6 +107,7 @@ Route::delete('brands/{id}', [BrandsController::class, 'destroy'])
     Route::put('products/{id}', [ProductsController::class, 'update'])->name('products.update');
     Route::delete('products/{id}', [ProductsController::class, 'destroy'])->name('products.destroy');
 
+
     // Image Upload (Dropzone)
     Route::post('products/upload-image', [ProductsController::class, 'uploadImage'])->name('products.uploadImage');
 
@@ -118,31 +124,55 @@ Route::get('/user/dashboard', function () {
 })->middleware(['auth'])
   ->name('user.dashboard');
 
-
-
 Route::view('/about', 'about')->name('about');
 Route::view('/contact', 'contact')->name('contact');
 
 
-
-
-
 // front routes
 
-
+// Public homepage
 Route::get('/', [FrontController::class, 'index'])->name('front.home');
+
+
+// Checkout page (auth required)
+Route::get('/checkout', [CheckoutController::class, 'index'])
+    ->middleware('auth')
+    ->name('front.checkout');
+
 Route::get('/shop', [ShopController::class, 'index'])->name('front.shop');
 
 
 Route::get('/product/{slug}', [ProductsController::class, 'product'])->name('front.product');
 
 
+
 Route::post('/cart/add', [CartController::class, 'add'])->name('front.cart.add');
-
 Route::get('/cart', [CartController::class, 'cart'])->name('front.cart.page');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
-Route::post('/cart/plus/{id}', [CartController::class, 'plus'])->name('cart.plus');
 
-Route::post('/cart/minus/{id}', [CartController::class, 'minus'])->name('cart.minus');
 
-Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+
+// user auth
+
+Route::get('/user/login', [UserauthController::class, 'index'])
+    ->name('login');
+
+Route::get('/user/register', [UserauthController::class, 'view'])->name('user_auth.register');
+
+Route::post('/user/login', [UserauthController::class, 'loginPost'])->name('user_auth.loginPost');
+
+Route::post('/user/register', [UserauthController::class, 'registerPost'])->name('user_auth.registerPost');
+
+Route::get('/user/logout', [UserauthController::class, 'logout'])->name('user_auth.logout');
+
+
+
+Route::get('/thanks', [ThanksController::class, 'index'])
+    ->name('front.thanks');
+
+
+Route::post('/process-checkout', [CheckoutController::class, 'processCheckout'])
+    ->middleware('auth')
+    ->name('front.process-checkout');

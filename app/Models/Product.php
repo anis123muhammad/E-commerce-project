@@ -15,7 +15,6 @@ class Product extends Model
         'description',
         'short_description',      // Add this
         'shipping_returns',        // Add this
-        'related_products',        // Add this
         'price',
         'compare_price',
         'category_id',
@@ -57,5 +56,17 @@ class Product extends Model
     {
     return $this->hasOne(ProductImage::class)->latest();
     }
+
+    // ✅ Many-to-Many Related Products
+public function relatedProducts()
+{
+    return $this->belongsToMany(
+        Product::class,
+        'product_related',
+        'product_id',
+        'related_product_id'
+    );
+}
+    
 
 }

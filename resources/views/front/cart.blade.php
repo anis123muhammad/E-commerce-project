@@ -13,15 +13,11 @@
         </div>
     </section>
 
-    <section class=" section-9 pt-4">
+    <section class="section-9 pt-4">
         <div class="container">
             <div class="row">
                 <div class="col-md-8">
-                    @if(session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
-@endif
+                    <div id="cart-alert"></div>
 
                     <div class="table-responsive">
                         <table class="table" id="cart">
@@ -34,113 +30,72 @@
                                     <th>Remove</th>
                                 </tr>
                             </thead>
-                         <tbody>
+                            <tbody id="cart-body">
+                                @php
+                                    $cart = session()->get('cart', []);
+                                    $subtotal = 0;
+                                @endphp
 
-@php $subtotal = 0; @endphp
-
-@if(count($cart) > 0)
-
-    @foreach($cart as $id => $item)
-
-        @php
-            $total = $item['price'] * $item['qty'];
-            $subtotal += $total;
-        @endphp
-
-        <tr>
-            <!-- Product -->
-            <td>
-                <div class="d-flex align-items-center justify-content-center">
-                                           @if(!empty($item['image']))
-    <img src="{{ asset('uploads/products/'.$item['image']) }}" width="50">
-@else
-    <img src="{{ asset('uploads/products/no-image.jpg') }}" width="50">
-@endif
-                    <h2>{{ $item['title'] }}</h2>
-                </div>
-            </td>
-
-            <!-- Price -->
-            <td>${{ $item['price'] }}</td>
-
-            <!-- Quantity -->
-            <td>
-                <div class="input-group quantity mx-auto" style="width: 100px;">
-
-                    <!-- Minus -->
-                    <form action="{{ route('cart.minus', $id) }}" method="POST">
-                        @csrf
-                        <button class="btn btn-sm btn-dark p-2">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                    </form>
-
-                    <input type="text"
-                           class="form-control form-control-sm border-0 text-center"
-                           value="{{ $item['qty'] }}" readonly>
-
-                    <!-- Plus -->
-                    <form action="{{ route('cart.plus', $id) }}" method="POST">
-                        @csrf
-                        <button class="btn btn-sm btn-dark p-2">
-                            <i class="fa fa-plus"></i>
-                        </button>
-                    </form>
-
-                </div>
-            </td>
-
-            <!-- Total -->
-            <td>${{ $total }}</td>
-
-            <!-- Remove -->
-            <td>
-                <form action="{{ route('cart.remove', $id) }}" method="POST">
-                    @csrf
-                    <button class="btn btn-sm btn-danger">
-                        <i class="fa fa-times"></i>
-                    </button>
-                </form>
-            </td>
-        </tr>
-
-    @endforeach
-
-@else
-    <tr>
-        <td colspan="5" class="text-center">
-            Cart is empty
-        </td>
-    </tr>
-@endif
-
-</tbody>
-
+                                @if(count($cart) > 0)
+                                    @foreach($cart as $id => $item)
+                                        @php $subtotal += $item['price'] * $item['qty']; @endphp
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center justify-content-center">
+                                                    <img src="{{ $item['image'] ? asset('uploads/products/'.$item['image']) : asset('uploads/products/no-image.jpg') }}" width="50">
+                                                    <h2>{{ $item['title'] }}</h2>
+                                                </div>
+                                            </td>
+                                            <td>${{ $item['price'] }}</td>
+                                            <td>
+                                                <div class="input-group quantity mx-auto" style="width: 100px;">
+                                                    <button class="btn btn-sm btn-dark btn-minus p-2" data-id="{{ $id }}">
+                                                        <i class="fa fa-minus"></i>
+                                                    </button>
+                                                    <input type="text" class="form-control form-control-sm border-0 text-center" value="{{ $item['qty'] }}" readonly>
+                                                    <button class="btn btn-sm btn-dark btn-plus p-2" data-id="{{ $id }}">
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>${{ $item['price'] * $item['qty'] }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-danger btn-remove" data-id="{{ $id }}">
+                                                    <i class="fa fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @else
+                                    <tr>
+                                        <td colspan="5" class="text-center">Cart is empty</td>
+                                    </tr>
+                                @endif
+                            </tbody>
                         </table>
                     </div>
                 </div>
+
                 <div class="col-md-4">
                     <div class="card cart-summery">
                         <div class="sub-title">
-                            <h2 class="bg-white">Cart Summery</h3>
+                            <h2 class="bg-white">Cart Summery</h2>
                         </div>
                         <div class="card-body">
-                            @php $shipping = 20; @endphp
-
                             <div class="d-flex justify-content-between pb-2">
                                 <div>Subtotal</div>
-                                <div>${{ $subtotal }}</div>
+                                <div id="subtotal">${{ $subtotal }}</div>
                             </div>
                             <div class="d-flex justify-content-between pb-2">
                                 <div>Shipping</div>
-                                <div>${{ $shipping  }}</div>
+                                <div id="shipping">$20</div>
                             </div>
                             <div class="d-flex justify-content-between summery-end">
                                 <div>Total</div>
-                                <div>${{ $subtotal + $shipping }}</div>
+                                <div id="total">${{ $subtotal + 20 }}</div>
                             </div>
                             <div class="pt-5">
-                                <a href="login.php" class="btn-dark btn btn-block w-100">Proceed to Checkout</a>
+                                <a href="{{ route('front.checkout') }}" class="btn-dark btn btn-block w-100">Proceed to Checkout</a>
                             </div>
                         </div>
                     </div>
@@ -153,4 +108,92 @@
         </div>
     </section>
 
+    <script>
+    $(document).ready(function() {
+        // Handle all button clicks
+        $(document).on('click', '.btn-plus, .btn-minus, .btn-remove', function() {
+            let id = $(this).data('id');
+            let action = $(this).hasClass('btn-plus') ? 'plus' :
+                        $(this).hasClass('btn-minus') ? 'minus' : 'remove';
+
+            if (action == 'remove' && !confirm('Remove this item?')) return;
+
+            handleCart(id, action);
+        });
+    });
+
+    function handleCart(id, action) {
+        let url = action == 'remove' ? '{{ route("cart.remove") }}' : '{{ route("cart.update") }}';
+        
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                id: id,
+                action: action
+            },
+            success: function(res) {
+                if (res.success) {
+                    updateCart(res.cart, res.subtotal, res.shipping, res.total);
+                    showMessage('success', res.message);
+                } else {
+                    showMessage('danger', res.message);
+                }
+            }
+        });
+    }
+
+    function updateCart(cart, subtotal, shipping, total) {
+        let html = '';
+
+        if (Object.keys(cart).length > 0) {
+            $.each(cart, function(id, item) {
+                html += `<tr>
+                    <td>
+                        <div class="d-flex align-items-center justify-content-center">
+                            <img src="{{ asset('uploads/products') }}/${item.image || 'no-image.jpg'}" width="50">
+                            <h2>${item.title}</h2>
+                        </div>
+                    </td>
+                    <td>$${item.price}</td>
+                    <td>
+                        <div class="input-group quantity mx-auto" style="width: 100px;">
+                            <button class="btn btn-sm btn-dark btn-minus p-2" data-id="${id}">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <input type="text" class="form-control form-control-sm border-0 text-center" value="${item.qty}" readonly>
+                            <button class="btn btn-sm btn-dark btn-plus p-2" data-id="${id}">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td>$${(item.price * item.qty).toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger btn-remove" data-id="${id}">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+        } else {
+            html = '<tr><td colspan="5" class="text-center">Cart is empty</td></tr>';
+        }
+
+        $('#cart-body').html(html);
+        $('#subtotal').text('$' + subtotal);
+        $('#shipping').text('$' + shipping);
+        $('#total').text('$' + total);
+    }
+
+    function showMessage(type, msg) {
+        $('#cart-alert').html(`
+            <div class="alert alert-${type} alert-dismissible fade show">
+                ${msg}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `);
+        setTimeout(() => $('#cart-alert').html(''), 3000);
+    }
+    </script>
 @endsection
