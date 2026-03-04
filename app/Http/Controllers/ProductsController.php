@@ -38,127 +38,131 @@ class ProductsController  extends Controller
     }
 
     // Store new product
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'sku' => 'required|unique:products,sku',
-        ]);
+  public function store(Request $request)
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'price' => 'required|numeric|min:0',
+        'category_id' => 'required|exists:categories,id',
+        'sku' => 'required|unique:products,sku',
+    ]);
 
-        $product = Product::create([
-            'title' => $request->title,
-            'slug' => Str::slug($request->title),
-            'description' => $request->description,
-            'short_description' => $request->short_description,
-            'shipping_returns' => $request->shipping_returns,
-            'price' => $request->price,
-            'compare_price' => $request->compare_price,
-            'category_id' => $request->category_id,
-            'sub_category_id' => $request->sub_category_id,
-            'brand_id' => $request->brand_id,
-            'sku' => $request->sku,
-            'barcode' => $request->barcode,
-            'track_qty' => $request->track_qty ? 'Yes' : 'No',
-            'qty' => $request->qty ?? 0,
-            'is_featured' => $request->is_featured ?? 'No',
-            'related_products' => $request->related_products ?? 'No',
-            'status' => $request->status ?? 1,
-        ]);
+    $product = Product::create([
+        'title' => $request->title,
+        'slug' => Str::slug($request->title),
+        'description' => $request->description,
+        'short_description' => $request->short_description,
+        'shipping_returns' => $request->shipping_returns,
+        'price' => $request->price,
+        'compare_price' => $request->compare_price,
+        'category_id' => $request->category_id,
+        'sub_category_id' => $request->sub_category_id,
+        'brand_id' => $request->brand_id,
+        'sku' => $request->sku,
+        'track_qty' => $request->track_qty ? 'Yes' : 'No',
+        'qty' => $request->qty ?? 0,
+        'is_featured' => $request->is_featured ?? 'No',
+        'related_products' => !empty($request->related_products)
+            ? implode(',', $request->related_products)
+            : null,                                          // ← inside create()
+        'status' => $request->status ?? 1,
+    ]);
 
-        // Save images
-        if ($request->image_array) {
-            foreach ($request->image_array as $index => $image) {
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image' => $image,
-                    'sort_order' => $index + 1
-                ]);
-            }
+    // Save images
+    if ($request->image_array) {
+        foreach ($request->image_array as $index => $image) {
+            ProductImage::create([
+                'product_id' => $product->id,
+                'image' => $image,
+                'sort_order' => $index + 1
+            ]);
         }
+    }
 
-        // Generate barcode number
+    // Generate barcode
     $barcodeNumber = 'PRD' . $product->id . rand(100, 999);
-    $product->barcode = $barcodeNumber;
-
-    // Generate barcode image
     $barcode = new DNS1D();
     $barcodeImage = $barcode->getBarcodePNG($barcodeNumber, 'C39');
     $path = 'uploads/barcodes/' . $barcodeNumber . '.png';
     file_put_contents(public_path($path), base64_decode($barcodeImage));
-    $product->barcode_image = $path;
 
-    $product->save();
+    $product->update([                                       // ← use update not save
+        'barcode' => $barcodeNumber,
+        'barcode_image' => $path,
+    ]);
 
-
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product created successfully!');
-    }
+    return redirect()->route('admin.products.index')
+        ->with('success', 'Product created successfully!');
+}
 
     // Show edit form
     public function edit($id)
     {
         $product = Product::with('images')->findOrFail($id);
 
-        return view('admin.products.edit',
+$relatedProducts = [];
+if ($product->related_products != '') {
+    $productArray = explode(',', $product->related_products);
+    $relatedProducts = Product::whereIn('id', $productArray)->get();
+}
+      // FIX - merge everything into one array:
+return view('admin.products.edit', [
+    'product' => $product,
+    'relatedProducts' => $relatedProducts,
+    'categories' => Category::where('status', 1)->get(),
+    'brands' => Brand::where('status', 1)->get(),
+    'subCategories' => SubCategory::where('category_id', $product->category_id)
+        ->where('status', 1)->get(),
+]);
 
-        [
-            'product' => $product,
-            'categories' => Category::where('status', 1)->get(),
-            'brands' => Brand::where('status', 1)->get(),
-            'subCategories' => SubCategory::where('category_id', $product->category_id)
-                ->where('status', 1)
-                ->get()
-        ]);
+
     }
+public function update(Request $request, $id)
+{
+    $product = Product::findOrFail($id);
 
-    // Update product
-    public function update(Request $request, $id)
-    {
-        $product = Product::findOrFail($id);
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'price' => 'required|numeric|min:0',
+        'category_id' => 'required|exists:categories,id',
+        'sku' => 'required|string|max:100|unique:products,sku,' . $product->id,
+    ]);
 
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'sku' => 'required|string|max:100|unique:products,sku,' . $product->id,
-        ]);
+    $product->update([
+        'title' => $request->title,
+        'slug' => Str::slug($request->title),
+        'description' => $request->description,
+        'short_description' => $request->short_description,
+        'shipping_returns' => $request->shipping_returns,
+        'price' => $request->price,
+        'compare_price' => $request->compare_price,
+        'category_id' => $request->category_id,
+        'sub_category_id' => $request->sub_category_id,
+        'brand_id' => $request->brand_id,
+        'sku' => $request->sku,
+        'track_qty' => $request->track_qty ? 'Yes' : 'No',
+        'qty' => $request->qty ?? 0,
+        'is_featured' => $request->is_featured ?? 'No',
+        'related_products' => !empty($request->related_products)
+            ? implode(',', $request->related_products)
+            : null,                                          // ← inside update()
+        'status' => $request->status ?? 1,
+    ]);
 
-        $product->update([
-            'title' => $request->title,
-            'slug' => Str::slug($request->title),
-            'description' => $request->description,
-            'short_description' => $request->short_description,
-            'shipping_returns' => $request->shipping_returns,
-            'price' => $request->price,
-            'compare_price' => $request->compare_price,
-            'category_id' => $request->category_id,
-            'sub_category_id' => $request->sub_category_id,
-            'brand_id' => $request->brand_id,
-            'sku' => $request->sku,
-            'barcode' => $request->barcode,
-            'track_qty' => $request->track_qty ? 'Yes' : 'No',
-            'qty' => $request->qty ?? 0,
-            'is_featured' => $request->is_featured ?? 'No',
-            'related_products' => $request->related_products ?? 'No',
-            'status' => $request->status ?? 1,
-        ]);
-
-        // Save new images
-        if ($request->image_array) {
-            foreach ($request->image_array as $index => $image) {
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image' => $image,
-                    'sort_order' => $index + 1
-                ]);
-            }
+    // Save new images
+    if ($request->image_array) {
+        foreach ($request->image_array as $index => $image) {
+            ProductImage::create([
+                'product_id' => $product->id,
+                'image' => $image,
+                'sort_order' => $index + 1
+            ]);
         }
-
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product updated successfully!');
     }
+
+    return redirect()->route('admin.products.index')
+        ->with('success', 'Product updated successfully!');
+}
 
     // Delete product
     public function destroy($id)
@@ -259,14 +263,33 @@ public function product($slug)
         ->where('status', 1)
         ->firstOrFail();
 
-             $relatedProducts = Product::where('related_products', 'Yes')
-        ->where('status', 1)
-        ->latest()
-        ->take(4)
-        ->with('firstImage')
-        ->get();
+    $relatedProducts = collect(); // empty default
+    if (!empty($product->related_products)) {
+        $ids = explode(',', $product->related_products);
+        $relatedProducts = Product::whereIn('id', $ids)
+            ->where('status', 1)
+            ->with('firstImage')
+            ->get();
+    }
 
     return view('front.product', compact('product', 'relatedProducts'));
 }
+public function getProducts(Request $request) {
+    $tempProduct = [];
 
+if($request->term != ""){
+ $products = Product::where('title', 'like', '%' . $request->term . '%')->get();
+
+    if($products != null){
+        foreach($products as $product){
+            $tempProduct[]=array('id' => $product->id,'text'=>$product->title);
+        }
+    }
+}
+
+return response()->json([
+    'tags' => $tempProduct,
+    'status' =>true
+]);
+}
 }

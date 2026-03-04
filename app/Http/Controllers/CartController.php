@@ -52,38 +52,40 @@ class CartController extends Controller
     }
 
     // Update Quantity (AJAX)
-    public function update(Request $request)
-    {
-        $cart = session()->get('cart', []);
+   public function update(Request $request)
+{
+    $cart = session()->get('cart', []);
+    $id = $request->id;
 
-        if (!isset($cart[$request->id])) {
-            return response()->json(['success' => false, 'message' => 'Product not found.']);
-        }
+    if (!isset($cart[$id])) {
+        return response()->json(['success' => false, 'message' => 'Item not found in cart.']);
+    }
 
-        // Increase
-        if ($request->action == 'plus') {
-            $product = Product::find($request->id);
+if ($request->action == 'plus') {
 
-            if ($product->track_qty == 'Yes' && $cart[$request->id]['qty'] >= $product->qty) {
-                return response()->json(['success' => false, 'message' => 'No more stock available.']);
-            }
+    $product = Product::find($id);
+    if ($product && $product->track_qty == 'Yes' && $cart[$id]['qty'] >= $product->qty) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Maximum available stock reached.'
+        ]);
+    }
 
-            $cart[$request->id]['qty']++;
-            $message = 'Quantity increased.';
-        }
-        // Decrease
-        else {
-            if ($cart[$request->id]['qty'] > 1) {
-                $cart[$request->id]['qty']--;
-                $message = 'Quantity decreased.';
-            } else {
-                unset($cart[$request->id]);
-                $message = 'Item removed.';
-            }
-        }
+    $cart[$id]['qty']++;
+    $message = 'Item quantity increased.';      // ← ADD
 
-        session()->put('cart', $cart);
-        return $this->getCartData($message);
+} elseif ($request->action == 'minus') {
+    if ($cart[$id]['qty'] > 1) {
+        $cart[$id]['qty']--;
+        $message = 'Item quantity decreased.';  // ← ADD
+    } else {
+        unset($cart[$id]);
+        $message = 'Item removed from cart.';   // ← ADD
+    }
+}
+
+session()->put('cart', $cart);
+return $this->getCartData($message);  // ✅ now $message is always defined
     }
 
     // Remove Item (AJAX)

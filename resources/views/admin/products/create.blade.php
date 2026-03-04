@@ -177,6 +177,22 @@
                         </div>
                     </div>
 
+                                        {{-- Related Products --}}
+<div class="card mb-3">
+    <div class="card-body">
+        <h2 class="h4 mb-3">Related Product</h2>
+
+    <!-- Make sure this is exactly right -->
+<select multiple
+        class="related_product w-100"
+        name="related_products[]"   {{-- ← array notation --}}
+        id="related_products">
+</select>
+        <p class="error"></p>
+
+    </div>
+</div>
+
                 </div>
 
                 <!-- RIGHT SIDE -->
@@ -252,17 +268,6 @@
                             </select>
                         </div>
                     </div>
-{{-- related products --}}
-                                    <div class="card mb-3">
-    <div class="card-body">
-        <h2 class="h4 mb-3">Related Product</h2>
-
-      <select name="related_products" id="related_products" class="form-control">
-    <option value="No" {{ old('related_products', 'No') == 'No' ? 'selected' : '' }}>No</option>
-    <option value="Yes" {{ old('related_products') == 'Yes' ? 'selected' : '' }}>Yes</option>
-</select>
-    </div>
-</div>
 
                 </div>
             </div>
@@ -305,6 +310,32 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js"></script>
 
 <script>
+
+
+$('.related_product').select2({
+    placeholder: "Select related products",
+    minimumInputLength: 3,
+    ajax: {
+        url: '{{ route("admin.products.getProducts") }}',
+        dataType: 'json',
+        delay: 250,
+        data: function(params) {
+            return {
+                term: params.term
+            };
+        },
+        processResults: function(data) {
+            return {
+                results: data.tags
+            };
+        },
+        cache: true
+    },
+    tags: false,      // ← change to false, tags:true causes issues with AJAX
+    multiple: true,
+});
+
+
 // ✅ Auto-generate Slug from Title
 document.getElementById('title').addEventListener('input', function() {
     let title = this.value;

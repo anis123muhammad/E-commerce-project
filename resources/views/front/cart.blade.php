@@ -49,7 +49,7 @@
                                             <td>${{ $item['price'] }}</td>
                                             <td>
                                                 <div class="input-group quantity mx-auto" style="width: 100px;">
-                                                    <button class="btn btn-sm btn-dark btn-minus p-2" data-id="{{ $id }}">
+               <button class="btn btn-sm btn-dark btn-minus p-2" data-id="{{ $id }}">
                                                         <i class="fa fa-minus"></i>
                                                     </button>
                                                     <input type="text" class="form-control form-control-sm border-0 text-center" value="{{ $item['qty'] }}" readonly>
@@ -82,27 +82,27 @@
                             <h2 class="bg-white">Cart Summery</h2>
                         </div>
                         <div class="card-body">
-                            <div class="d-flex justify-content-between pb-2">
+                            {{-- <div class="d-flex justify-content-between pb-2">
                                 <div>Subtotal</div>
                                 <div id="subtotal">${{ $subtotal }}</div>
-                            </div>
-                            <div class="d-flex justify-content-between pb-2">
+                            </div> --}}
+                            {{-- <div class="d-flex justify-content-between pb-2">
                                 <div>Shipping</div>
                                 <div id="shipping">$20</div>
-                            </div>
+                            </div> --}}
                             <div class="d-flex justify-content-between summery-end">
                                 <div>Total</div>
-                                <div id="total">${{ $subtotal + 20 }}</div>
+                                <div id="total">${{ $subtotal }}</div>
                             </div>
                             <div class="pt-5">
                                 <a href="{{ route('front.checkout') }}" class="btn-dark btn btn-block w-100">Proceed to Checkout</a>
                             </div>
                         </div>
                     </div>
-                    <div class="input-group apply-coupan mt-4">
+                    {{-- <div class="input-group apply-coupan mt-4">
                         <input type="text" placeholder="Coupon Code" class="form-control">
                         <button class="btn btn-dark" type="button" id="button-addon2">Apply Coupon</button>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
@@ -124,7 +124,7 @@
 
     function handleCart(id, action) {
         let url = action == 'remove' ? '{{ route("cart.remove") }}' : '{{ route("cart.update") }}';
-        
+
         $.ajax({
             url: url,
             type: 'POST',
@@ -181,8 +181,6 @@
         }
 
         $('#cart-body').html(html);
-        $('#subtotal').text('$' + subtotal);
-        $('#shipping').text('$' + shipping);
         $('#total').text('$' + total);
     }
 

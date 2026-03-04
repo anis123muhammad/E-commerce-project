@@ -11,8 +11,10 @@
         "intervention/image": "*",
         "intervention/image-laravel": "^1.5",
         "laravel/framework": "^12.0",
+        "laravel/sanctum": "^4.3",
         "laravel/tinker": "^2.10.1",
-        "milon/barcode": "^12.1"
+        "milon/barcode": "^12.1",
+        "stripe/stripe-php": "^19.4"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

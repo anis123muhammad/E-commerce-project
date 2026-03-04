@@ -50,21 +50,21 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link @if(request()->routeIs('admin.ship.index')) active @endif">
+                    <a href="{{ route('admin.shippings.index') }}" class="nav-link @if(request()->routeIs('admin.shippings.index')) active @endif">
                         <i class="nav-icon fas fa-truck"></i>
                         <p>Shipping</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link @if(request()->route('admin.order.index')) active @endif">
+                    <a href="{{ route('admin.order.order') }}" class="nav-link @if(request()->routeIs('admin.order.order')) active @endif">
                         <i class="nav-icon fas fa-shopping-bag"></i>
                         <p>Orders</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('admin.coupons.index') }}" class="nav-link @if(request()->routeIs('admin.coupons.index')) active @endif">
                         <i class="nav-icon fa fa-percent"></i>
                         <p>Discount</p>
                     </a>

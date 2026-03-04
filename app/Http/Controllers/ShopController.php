@@ -66,5 +66,24 @@ if ($request->sort == "price_low") {
 }
 
 
+public function product($slug)
+{
+    $product = Product::with(['images', 'category', 'brand'])
+        ->where('slug', $slug)
+        ->where('status', 1)
+        ->firstOrFail();
+
+    $relatedProducts = collect();
+    if (!empty($product->related_products)) {
+        $ids = explode(',', $product->related_products);
+        $relatedProducts = Product::whereIn('id', $ids)
+            ->where('status', 1)
+            ->with('firstImage')
+            ->get();
+    }
+
+    return view('front.product', compact('product', 'relatedProducts'));
+}
+
 
 }

@@ -38,26 +38,44 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-borderless">
-                    <thead class="text-muted">
-                        <tr>
-                            <th>Product</th>
-                            <th>Qty</th>
-                            <th>Price</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($order->items as $item)
-                        <tr>
-                            <td>{{ $item->name }}</td>
-                            <td>{{ $item->qty }}</td>
-                            <td>${{ number_format($item->price, 2) }}</td>
-                            <td>${{ number_format($item->total, 2) }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+               <table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Line Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($order->items as $item)
+        <tr>
+            <td>{{ $item->name }}</td>
+            <td>{{ $item->qty }}</td>
+            <td>${{ number_format($item->price, 2) }}</td>
+            <td>${{ number_format($item->price * $item->qty, 2) }}</td>
+        </tr>
+        @endforeach
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="3" class="text-right">Subtotal:</th>
+            <th>${{ number_format($order->subtotal, 2) }}</th>
+        </tr>
+        <tr>
+            <th colspan="3" class="text-right">Discount:</th>
+            <th>${{ number_format($order->discount, 2) }}</th>
+        </tr>
+        <tr>
+            <th colspan="3" class="text-right">Shipping:</th>
+            <th>${{ number_format($order->shipping, 2) }}</th>
+        </tr>
+        <tr>
+            <th colspan="3" class="text-right">Grand Total:</th>
+            <th>${{ number_format($order->grand_total, 2) }}</th>
+        </tr>
+    </tfoot>
+</table>
             </div>
         </div>
     </div>

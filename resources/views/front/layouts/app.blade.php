@@ -81,7 +81,7 @@
 @endif
 
 			<div class="col-lg-6 col-6 text-left  d-flex justify-content-end align-items-center">
-				<a href="account.php" class="nav-link text-dark">My Account</a>
+				<a href="{{ route('front.account.profile') }}" class="nav-link text-dark">My Account</a>
 				<form action="">
 					<div class="input-group">
 						<input type="text" placeholder="Search For Products" class="form-control" aria-label="Amount (to the nearest dollar)">
@@ -195,12 +195,51 @@
 		</div>
 	</div>
 </footer>
+<script>
+    $(document).on('click', '.wishlist-btn', function () {
+    let btn = $(this);
+    let productId = btn.data('product-id');
+
+    $.ajax({
+        url: '{{ route("front.account.wishlist.toggle") }}',  // or hardcode: '/wishlist/toggle'
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            product_id: productId
+        },
+        success: function (res) {
+            if (!res.status) {
+                // Not logged in
+                alert(res.message); // or redirect to login
+                window.location.href = '/login';
+                return;
+            }
+
+            if (res.action === 'added') {
+                btn.find('i').removeClass('far').addClass('fas text-danger');
+            } else {
+                btn.find('i').removeClass('fas text-danger').addClass('far');
+            }
+
+            // Optional toast message
+            showToast(res.message);
+        }
+    });
+});
+
+function showToast(msg) {
+    // Simple alert or use your toast library
+    console.log(msg);
+}
+</script>
 <script src="{{ asset('front-assets/js/jquery-3.6.0.min.js') }}"></script>
 <script src="{{ asset('front-assets/js/bootstrap.bundle.5.1.3.min.js') }}"></script>
 <script src="{{ asset('front-assets/js/instantpages.5.1.0.min.js') }}"></script>
 <script src="{{ asset('front-assets/js/lazyload.17.6.0.min.js') }}"></script>
 <script src="{{ asset('front-assets/js/slick.min.js') }}"></script>
 <script src="{{ asset('front-assets/js/custom.js') }}"></script>
+{{-- <script src="{{ asset('front-assets/js/js.stripe.js') }}"></script> --}}
+<script src="https://js.stripe.com/clover/stripe.js"></script>
 <script>
 window.onscroll = function() {myFunction()};
 

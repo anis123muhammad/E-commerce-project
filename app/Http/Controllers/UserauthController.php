@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -80,4 +81,32 @@ class UserauthController extends Controller
         Auth::logout();
         return redirect()->route('login');
     }
+
+
+    // user account logic
+
+        public function profile()
+    {
+        return view('front.account.profile');
+    }
+
+    public function orders()
+    {
+        $orders = Order::where('user_id', Auth::id())
+                        ->latest()
+                        ->get();
+
+        return view('front.account.order', compact('orders'));
+    }
+
+    public function orderDetail($id)
+    {
+        $order = Order::where('id', $id)
+                      ->where('user_id', Auth::id())
+                      ->with('items')
+                      ->firstOrFail();
+
+        return view('front.account.order-detail', compact('order'));
+    }
+
 }

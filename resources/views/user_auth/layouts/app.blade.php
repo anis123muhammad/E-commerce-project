@@ -51,10 +51,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ion-rangeslider@2.3.1/css/ion.rangeSlider.min.css"/>
 
 <!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!-- Ion RangeSlider JS -->
-<script src="https://cdn.jsdelivr.net/npm/ion-rangeslider@2.3.1/js/ion.rangeSlider.min.js"></script>
 </head>
 <style>
     .dropdown-item.active {
@@ -80,7 +78,7 @@
     </div>
 @endif
 
-			
+
 		</div>
 	</div>
 </div>

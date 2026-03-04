@@ -163,8 +163,11 @@
                                  alt="">
                         </a>
 
-                        <a class="whishlist" href="#"><i class="far fa-heart"></i></a>
-
+<a class="whishlist wishlist-btn"
+   href="javascript:void(0)"
+   data-product-id="{{ $product->id }}">
+   <i class="{{ $product->isWishlisted() ? 'fas fa-heart text-danger' : 'far fa-heart' }}"></i>
+</a>
                         <div class="product-action">
                                            <form action="{{ route('front.cart.add') }}" method="POST">
     @csrf
@@ -211,8 +214,11 @@
                                         : asset('front-assets/images/no-image.png') }}"
                                  alt="">
                         </a>
-                        <a class="whishlist" href="#"><i class="far fa-heart"></i></a>
-
+<a class="whishlist wishlist-btn"
+   href="javascript:void(0)"
+   data-product-id="{{ $product->id }}">
+   <i class="{{ $product->isWishlisted() ? 'fas fa-heart text-danger' : 'far fa-heart' }}"></i>
+</a>
                         <div class="product-action">
                                             <form action="{{ route('front.cart.add') }}" method="POST">
     @csrf

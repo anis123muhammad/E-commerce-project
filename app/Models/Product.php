@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\Wishlist;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,6 +15,7 @@ class Product extends Model
         'description',
         'short_description',      // Add this
         'shipping_returns',        // Add this
+            'related_products',
         'price',
         'compare_price',
         'category_id',
@@ -67,6 +68,13 @@ public function relatedProducts()
         'related_product_id'
     );
 }
-    
+
+public function isWishlisted()
+{
+    if (!auth()->check()) return false;
+    return Wishlist::where('user_id', auth()->id())
+        ->where('product_id', $this->id)
+        ->exists();
+}
 
 }

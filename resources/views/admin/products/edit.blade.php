@@ -202,6 +202,19 @@
                         </div>
                     </div>
 
+                    {{-- Related Products --}}
+<div class="card mb-3">
+    <div class="card-body">
+        <h2 class="h4 mb-3">Related Product</h2>
+
+        <select multiple class="related_product w-100" name="related_products[]" id="related_products">
+
+        </select>
+        <p class="error"></p>
+
+    </div>
+</div>
+
                 </div>
 
                 <!-- RIGHT SIDE -->
@@ -286,18 +299,6 @@
                     </div>
 
 
-{{-- Related Products --}}
-<div class="card mb-3">
-    <div class="card-body">
-        <h2 class="h4 mb-3">Related Product</h2>
-
-        <select name="related_products" id="related_products" class="form-control">
-            <option value="No" {{ old('related_products', $product->related_products) == 'No' ? 'selected' : '' }}>No</option>
-            <option value="Yes" {{ old('related_products', $product->related_products)  == 'Yes' ? 'selected' : '' }}>Yes</option>
-        </select>
-    </div>
-</div>
-
 
                 </div>
             </div>
@@ -332,6 +333,42 @@
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js"></script>
 <script>
+
+// Step 1: Initialize Select2
+$('.related_product').select2({
+    placeholder: "Select related products",
+    minimumInputLength: 3,
+    ajax: {
+        url: '{{ route("admin.products.getProducts") }}',
+        dataType: 'json',
+        delay: 250,
+        data: function(params) {
+            return { term: params.term };
+        },
+        processResults: function(data) {
+            return { results: data.tags };
+        },
+        cache: true
+    },
+    tags: false,
+    multiple: true,
+});
+
+// Step 2: Pre-load existing related products AFTER select2 init
+@if(!empty($relatedProducts) && count($relatedProducts) > 0)
+    @foreach($relatedProducts as $rp)
+        var option_{{ $rp->id }} = new Option(
+            '{{ addslashes($rp->title) }}',
+            '{{ $rp->id }}',
+            true,   // defaultSelected
+            true    // selected
+        );
+        $('#related_products').append(option_{{ $rp->id }}).trigger('change');
+    @endforeach
+@endif
+
+// rest of your scripts below...
+
 // Auto-generate slug
 document.getElementById('title').oninput = function() {
     document.getElementById('slug').value = this.value
