@@ -12,7 +12,7 @@
             <div class="col-sm-6 text-right">
                 <a href="{{ route('admin.categories.index') }}" class="btn btn-primary">Back</a>
             </div>
-        </div>
+        </div>z
     </div>
 </section>
 

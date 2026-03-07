@@ -15,12 +15,21 @@ use App\Http\Controllers\UserauthController;
 use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WishlistsController;
+use App\Http\Controllers\UserDetailController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
 
 /* Login */
 
-    Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])
-    ->name('admin.login');
+Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])
+->name('admin.login');
+
+// Show registration form
+Route::get('/admin/register', [AdminAuthController::class, 'showRegister'])->name('admin.register');
+
+// Submit registration
+Route::post('/admin/register', [AdminAuthController::class, 'register'])->name('admin.register.submit');
 
 Route::post('/login', [AdminAuthController::class, 'login'])
     ->name('login.submit');
@@ -31,11 +40,11 @@ Route::post('/logout', [AdminAuthController::class, 'logout'])
 Route::get('/admin/dashboard', function () {
     return view('admin.dashboard');
 })->middleware(['auth', 'admin'])
-  ->name('admin.dashboard');
+    ->name('admin.dashboard');
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
-// categories routes
+    // categories routes
 
     Route::get('categories', [CategoryController::class, 'index'])
         ->name('categories.index');
@@ -55,49 +64,49 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('categories/{id}', [CategoryController::class, 'destroy'])
         ->name('categories.destroy');
 
-// sub-category routes
+    // sub-category routes
 
-Route::get('sub-categories', [SubCategoryController::class, 'index'])
-    ->name('sub-categories.index');
+    Route::get('sub-categories', [SubCategoryController::class, 'index'])
+        ->name('sub-categories.index');
 
-Route::get('sub-categories/create', [SubCategoryController::class, 'create'])
-    ->name('sub-categories.create');
+    Route::get('sub-categories/create', [SubCategoryController::class, 'create'])
+        ->name('sub-categories.create');
 
-Route::post('sub-categories', [SubCategoryController::class, 'store'])
-    ->name('sub-categories.store');
+    Route::post('sub-categories', [SubCategoryController::class, 'store'])
+        ->name('sub-categories.store');
 
-Route::get('sub-categories/{id}/edit', [SubCategoryController::class, 'edit'])
-    ->name('sub-categories.edit');
+    Route::get('sub-categories/{id}/edit', [SubCategoryController::class, 'edit'])
+        ->name('sub-categories.edit');
 
-Route::put('sub-categories/{id}', [SubCategoryController::class, 'update'])
-    ->name('sub-categories.update');
+    Route::put('sub-categories/{id}', [SubCategoryController::class, 'update'])
+        ->name('sub-categories.update');
 
-Route::delete('sub-categories/{id}', [SubCategoryController::class, 'destroy'])
-    ->name('sub-categories.destroy');
+    Route::delete('sub-categories/{id}', [SubCategoryController::class, 'destroy'])
+        ->name('sub-categories.destroy');
 
-// Brands routes
+    // Brands routes
 
-Route::get('brands', [BrandsController::class, 'index'])
-    ->name('brands.index');
+    Route::get('brands', [BrandsController::class, 'index'])
+        ->name('brands.index');
 
-Route::get('brands/create', [BrandsController::class, 'create'])
-    ->name('brands.create');
+    Route::get('brands/create', [BrandsController::class, 'create'])
+        ->name('brands.create');
 
-Route::post('brands', [BrandsController::class, 'store'])
-    ->name('brands.store');
+    Route::post('brands', [BrandsController::class, 'store'])
+        ->name('brands.store');
 
-Route::get('brands/{id}/edit', [BrandsController::class, 'edit'])
-    ->name('brands.edit');
+    Route::get('brands/{id}/edit', [BrandsController::class, 'edit'])
+        ->name('brands.edit');
 
-Route::put('brands/{id}', [BrandsController::class, 'update'])
-    ->name('brands.update');
+    Route::put('brands/{id}', [BrandsController::class, 'update'])
+        ->name('brands.update');
 
-Route::delete('brands/{id}', [BrandsController::class, 'destroy'])
-    ->name('brands.destroy');
+    Route::delete('brands/{id}', [BrandsController::class, 'destroy'])
+        ->name('brands.destroy');
 
     // products routes
 
- // Product Routes
+    // Product Routes
     Route::get('products', [ProductsController::class, 'index'])->name('products.index');
     Route::get('products/create', [ProductsController::class, 'create'])->name('products.create');
     Route::post('products', [ProductsController::class, 'store'])->name('products.store');
@@ -111,12 +120,12 @@ Route::delete('brands/{id}', [BrandsController::class, 'destroy'])
     // Get Subcategories by Category
     Route::get('products/subcategories/{categoryId}', [ProductsController::class, 'getSubcategories']);
 
-       Route::delete('products/delete-image/{id}', [ProductsController::class, 'deleteImage'])
+    Route::delete('products/delete-image/{id}', [ProductsController::class, 'deleteImage'])
         ->name('products.deleteImage');
 
 
     Route::get('/get-products', [ProductsController::class, 'getProducts'])
-    ->name('products.getProducts');
+        ->name('products.getProducts');
 
 
 
@@ -142,14 +151,11 @@ Route::delete('brands/{id}', [BrandsController::class, 'destroy'])
     Route::delete('coupons/{id}', [CouponsCodeController::class, 'destroy'])
         ->name('coupons.destroy');
 
-
-
-
 });
 Route::get('/user/dashboard', function () {
     return view('user.dashboard');
 })->middleware(['auth'])
-  ->name('user.dashboard');
+    ->name('user.dashboard');
 
 Route::view('/about', 'about')->name('about');
 Route::view('/contact', 'contact')->name('contact');
@@ -158,6 +164,9 @@ Route::view('/contact', 'contact')->name('contact');
 
 // Public homepage
 Route::get('/', [FrontController::class, 'index'])->name('front.home');
+
+Route::get('page/{slug}', [FrontController::class, 'page'])->name('front.page');
+
 
 // Checkout page (auth required)
 Route::get('/checkout', [CheckoutController::class, 'index'])
@@ -193,11 +202,10 @@ Route::post('/process-checkout', [CheckoutController::class, 'processCheckout'])
     ->middleware('auth')
     ->name('front.process-checkout');
 
-    Route::post('/apply-coupon', [CheckoutController::class, 'applyCoupon'])
+Route::post('/apply-coupon', [CheckoutController::class, 'applyCoupon'])
     ->name('front.applyCoupon');
 
-
-    Route::prefix('admin')->middleware(['auth'])->group(function () {
+Route::prefix('admin')->middleware(['auth'])->group(function () {
 
     Route::get('/shipping', [ShippingController::class, 'index'])->name('admin.shippings.index');
 
@@ -249,3 +257,72 @@ Route::post('/emails/order-invoice', [OrderController::class, 'sendInvoiceEmail'
     ->name('emails.order-invoice');
 
 
+Route::middleware(['auth'])->group(function () {
+
+    // Show account settings page
+    Route::get('/account/settings', [UserDetailController::class, 'edit'])
+        ->name('user.settings');
+
+    // Update personal information (name, email, password)
+    Route::post('/account/settings/personal', [UserDetailController::class, 'updatePersonal'])
+        ->name('user.updatePersonal');
+
+    // Update address information
+    Route::post('/account/settings/address', [UserDetailController::class, 'updateAddress'])
+        ->name('user.updateAddress');
+
+});
+
+
+Route::prefix('admin')->group(function () {
+
+    // User listing
+    Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
+
+    // Create user
+    Route::get('/users/create', [UserController::class, 'create'])->name('admin.users.create');
+    Route::post('users', [UserController::class, 'store'])->name('admin.users.store');
+
+    // Edit user
+    Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
+
+    Route::put('users/{id}', [UserController::class, 'update'])->name('admin.users.update');
+
+    // Delete user
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+
+// pages routes
+
+
+    // User listing
+    Route::get('/pages', [PageController::class, 'index'])->name('admin.pages.index');
+
+    // Create user
+    Route::get('/pages/create', [PageController::class, 'create'])->name('admin.pages.create');
+
+    Route::post('pages', [PageController::class, 'store'])->name('admin.pages.store');
+
+    // Edit user
+    Route::get('/pages/{id}/edit', [PageController::class, 'edit'])->name('admin.pages.edit');
+
+    Route::put('pages/{id}', [PageController::class, 'update'])->name('admin.pages.update');
+
+    // Delete user
+    Route::delete('/pages/{id}', [PageController::class, 'destroy'])->name('admin.pages.destroy');
+
+});
+
+
+// Show Change Password Form
+Route::middleware(['auth'])->get('/admin/change-password', [AdminAuthController::class, 'showChangePasswordForm'])
+    ->name('admin.users.changePasswordForm');
+
+// Handle Change Password POST
+Route::middleware(['auth'])->post('/admin/change-password', [AdminAuthController::class, 'updatePassword'])
+    ->name('admin.users.updatePassword');
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/admin/update-personal', [AdminAuthController::class, 'updatePersonal'])
+        ->name('admin.updatePersonal');
+});

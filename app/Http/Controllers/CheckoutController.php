@@ -182,7 +182,7 @@ foreach ($cart as $id => $item) {
     if ($product && $product->track_qty == 'Yes') {
         $product->update(['qty' => max(0, $product->qty - $item['qty'])]);
     }
-}
+} 
 
 session()->forget('cart');
 

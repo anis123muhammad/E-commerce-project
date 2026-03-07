@@ -22,6 +22,13 @@
 
                 <div class="dropdown-divider"></div>
 
+            <a href="{{ route('admin.users.changePasswordForm') }}" class="dropdown-item text-info">
+    <i class="fas fa-sign-out-alt mr-2"></i> Change Password
+</a>
+
+
+
+
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button class="dropdown-item text-danger">

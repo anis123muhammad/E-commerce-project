@@ -79,7 +79,7 @@
 
     <button type="submit" class="btn btn-primary">
         <i class="fas fa-save"></i> Update
-    </button>
+    </button>PlistP
 
     <a href="{{ route('admin.brands.index') }}" class="btn btn-secondary">
         Cancel

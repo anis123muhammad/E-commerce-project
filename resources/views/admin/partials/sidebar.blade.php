@@ -71,14 +71,16 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('admin.users.index') }}" class="nav-link
+                   @if (request()->routeIs('admin.users.index')) active @endif" >
                         <i class="nav-icon fas fa-users"></i>
                         <p>Users</p>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('admin.pages.index') }}" class="nav-link
+                  @if(request()->routeIs('admin.pages.index')) active @endif  ">
                         <i class="nav-icon far fa-file-alt"></i>
                         <p>Pages</p>
                     </a>

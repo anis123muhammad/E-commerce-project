@@ -352,7 +352,6 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     }
 });
 
-
 // ─── Country Change → Fetch Shipping ──────────────────────────────────────────
 document.getElementById('country').addEventListener('change', function() {
     let countryId = this.value;
@@ -387,7 +386,6 @@ document.getElementById('country').addEventListener('change', function() {
         document.getElementById('total_amount').innerText = subtotal.toFixed(2);
     });
 });
-
 
 // ─── Apply Coupon ──────────────────────────────────────────────────────────────
 document.getElementById('apply_coupon_btn').addEventListener('click', function() {

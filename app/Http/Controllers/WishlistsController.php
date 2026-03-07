@@ -33,7 +33,7 @@ class WishlistsController extends Controller
 
         // Not in wishlist → add it (1 product only once)
         Wishlist::create([
-            'user_id'    => Auth::id(),
+            'user_id' => Auth::id(),
             'product_id' => $request->product_id
         ]);
 

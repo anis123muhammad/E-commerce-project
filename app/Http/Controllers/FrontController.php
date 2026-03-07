@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Product;
+use App\Models\Page;
 use Illuminate\Http\Request;
 
 class FrontController extends Controller
@@ -24,4 +25,18 @@ class FrontController extends Controller
 
         return view('front.home', compact('featuredProducts', 'latestProducts'));
     }
+
+    public function page($slug){
+
+    $page = Page::where('slug', $slug)->first();
+    if($page == null){
+        abort(404);
+    }
+
+    return view('front.page',[
+        'page' => $page
+    ]);
+
+    }
+
 }

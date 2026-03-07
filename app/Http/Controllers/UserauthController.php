@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\country;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -49,7 +50,7 @@ class UserauthController extends Controller
             return redirect()->intended(route('front.checkout'));
         }
 
-        return redirect()->route('front.home')->with('success', 'Registered Successfully!');
+        return redirect()->route('user_auth.loginPost');
     }
 
     // ✅ Login Functionality
@@ -85,10 +86,14 @@ class UserauthController extends Controller
 
     // user account logic
 
-        public function profile()
-    {
-        return view('front.account.profile');
-    }
+    public function profile()
+{
+    $user = Auth::user();
+    $address = $user->address ?? null;
+    $countries = Country::all();
+
+    return view('front.account.profile', compact('user', 'address', 'countries'));
+}
 
     public function orders()
     {
