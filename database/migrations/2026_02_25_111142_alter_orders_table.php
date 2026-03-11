@@ -12,15 +12,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->enum('payment_status', ['paid', 'not_paid'])
-                  ->after('grand_total')
-                  ->default('not_paid');
+            // Only add payment_status if it does not exist
+            if (!Schema::hasColumn('orders', 'payment_status')) {
+                $table->enum('payment_status', ['paid', 'not_paid'])
+                      ->after('grand_total')
+                      ->default('not_paid');
+            }
 
-            $table->enum('status', ['pending', 'shipped', 'delivered', 'cancelled'])
-                  ->after('payment_status')
-                  ->default('pending');
+            // Only add status if it does not exist
+            if (!Schema::hasColumn('orders', 'status')) {
+                $table->enum('status', ['pending', 'shipped', 'delivered', 'cancelled'])
+                      ->after('payment_status')
+                      ->default('pending');
+            }
 
-                  $table->timestamp('shipped_date')->nullable()->after('status');
+            // Only add shipped_date if it does not exist
+            if (!Schema::hasColumn('orders', 'shipped_date')) {
+                $table->timestamp('shipped_date')->nullable()->after('status');
+            }
         });
     }
 
@@ -30,8 +39,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('payment_status');
-            $table->dropColumn('status');
+            if (Schema::hasColumn('orders', 'payment_status')) {
+                $table->dropColumn('payment_status');
+            }
+            if (Schema::hasColumn('orders', 'status')) {
+                $table->dropColumn('status');
+            }
+            if (Schema::hasColumn('orders', 'shipped_date')) {
+                $table->dropColumn('shipped_date');
+            }
         });
     }
 };

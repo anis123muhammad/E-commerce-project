@@ -86,6 +86,14 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a href="{{ route('admin.reviews.index') }}" class="nav-link
+                  @if(request()->routeIs('admin.reviews.index')) active @endif  ">
+                        <i class="nav-icon far fa-file-alt"></i>
+                        <p>Ratings</p>
+                    </a>
+                </li>
+
             </ul>
         </nav>
     </div>

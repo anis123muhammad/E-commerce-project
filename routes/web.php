@@ -18,6 +18,7 @@ use App\Http\Controllers\WishlistsController;
 use App\Http\Controllers\UserDetailController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /* Login */
@@ -37,10 +38,21 @@ Route::post('/login', [AdminAuthController::class, 'login'])
 Route::post('/logout', [AdminAuthController::class, 'logout'])
     ->name('logout');
 
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
-})->middleware(['auth', 'admin'])
-    ->name('admin.dashboard');
+
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])
+    ->name('admin.dashboard')
+    ->middleware(['auth', 'admin']);
+
+    Route::prefix('admin')->middleware('auth')->group(function() {
+    Route::get('reviews', [DashboardController::class, 'adminReviews'])->name('admin.reviews.index');
+
+    Route::post('reviews/{id}/approve', [DashboardController::class, 'approveReview'])->name('admin.reviews.approve');
+
+// Delete a review
+Route::delete('admin/reviews/{id}', [DashboardController::class, 'destroy'])->name('admin.reviews.destroy');
+});
+
+
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
@@ -157,6 +169,8 @@ Route::get('/user/dashboard', function () {
 })->middleware(['auth'])
     ->name('user.dashboard');
 
+
+
 Route::view('/about', 'about')->name('about');
 Route::view('/contact', 'contact')->name('contact');
 
@@ -176,6 +190,7 @@ Route::get('/checkout', [CheckoutController::class, 'index'])
 Route::get('/shop', [ShopController::class, 'index'])->name('front.shop');
 
 Route::get('/product/{slug}', [ProductsController::class, 'product'])->name('front.product');
+Route::post('/product/{id}/review', [ProductsController::class, 'submitReview'])->name('product.review.submit');
 
 Route::post('/cart/add', [CartController::class, 'add'])->name('front.cart.add');
 Route::get('/cart', [CartController::class, 'cart'])->name('front.cart.page');
@@ -235,6 +250,18 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/front/account/order/{id}', [UserauthController::class, 'orderDetail'])
         ->name('front.account.orderDetail');
+
+Route::get('/front/account/forgot-password', [UserauthController::class, 'forgot_password'])
+    ->name('front.account.forgot-password');
+
+Route::post('/forgot-password', [UserauthController::class,'sendResetEmail'])
+    ->name('password.email');
+
+Route::get('/reset-password/{token}', [UserauthController::class,'showResetForm'])
+    ->name('password.reset');
+
+Route::post('/reset-password', [UserauthController::class,'updatePassword'])
+    ->name('password.update');
 
     // Add auth middleware
 

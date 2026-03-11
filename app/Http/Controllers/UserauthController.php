@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\country;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 
 class UserauthController extends Controller
 {
@@ -113,5 +114,53 @@ class UserauthController extends Controller
 
         return view('front.account.order-detail', compact('order'));
     }
+
+    public function forgot_password(){
+        return view('front.account.forgot-password');
+    }
+
+
+    public function sendResetEmail(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email'
+    ]);
+
+    $status = Password::sendResetLink(
+        $request->only('email')
+    );
+
+    return $status === Password::RESET_LINK_SENT
+        ? back()->with('success','Reset link sent to your email')
+        : back()->withErrors(['email' => __($status)]);
+}   
+public function showResetForm($token)
+{
+    return view('front.account.reset-password', ['token' => $token]);
+}
+
+public function updatePassword(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|confirmed|min:6',
+        'token' => 'required'
+    ]);
+
+    $status = Password::reset(
+        $request->only('email','password','password_confirmation','token'),
+
+        function ($user, $password) {
+            $user->password = Hash::make($password);
+            $user->save();
+        }
+    );
+
+    if ($status == Password::PASSWORD_RESET) {
+        return redirect()->route('login')->with('success','Password reset successful');
+    }
+
+    return back()->withErrors(['email' => __($status)]);
+}
 
 }

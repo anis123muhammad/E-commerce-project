@@ -65,3 +65,4 @@ class WishlistsController extends Controller
         return redirect()->back()->with('success', 'Removed from wishlist.');
     }
 }
+    

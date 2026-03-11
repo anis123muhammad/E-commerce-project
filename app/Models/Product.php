@@ -15,7 +15,7 @@ class Product extends Model
         'description',
         'short_description',      // Add this
         'shipping_returns',        // Add this
-            'related_products',
+        'related_products',
         'price',
         'compare_price',
         'category_id',
@@ -68,6 +68,15 @@ public function relatedProducts()
         'related_product_id'
     );
 }
+
+public function reviews() {
+    return $this->hasMany(ProductReview::class)->where('is_approved', 1); // only approved for front-end
+}
+
+public function allReviews() {
+    return $this->hasMany(ProductReview::class); // for admin, includes pending
+}
+
 
 public function isWishlisted()
 {

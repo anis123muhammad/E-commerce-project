@@ -11,6 +11,8 @@ use App\Models\Brand;
 use Illuminate\Support\Str;
 use Milon\Barcode\DNS1D;
 use Illuminate\Support\Facades\File;
+use App\Models\ProductReview;
+use Illuminate\Support\Facades\Auth;
 
 class ProductsController  extends Controller
 {
@@ -291,5 +293,36 @@ return response()->json([
     'tags' => $tempProduct,
     'status' =>true
 ]);
+}
+
+
+public function submitReview(Request $request, $productId)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'rating' => 'required|integer|min:1|max:5',
+        'review' => 'required|string',
+    ]);
+
+    // Prevent duplicate review by same user
+    $exists = ProductReview::where('product_id', $productId)
+        ->where('email', $request->email)
+        ->exists();
+
+    if ($exists) {
+        return back()->with('error', 'You have already submitted a review for this product.');
+    }
+
+    ProductReview::create([
+        'product_id' => $productId,
+        'name' => $request->name,
+        'email' => $request->email,
+        'rating' => $request->rating,
+        'review' => $request->review,
+        'is_approved' => false, // pending by default
+    ]);
+
+    return back()->with('success', 'Review submitted! Waiting for admin approval.');
 }
 }
